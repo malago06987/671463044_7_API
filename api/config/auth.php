@@ -8,7 +8,7 @@ function checkLogin($conn){
 
         $userID = $_SESSION['userID'];
 
-        $sql = "SELECT userID, firstName, lastName, nickName, email, role, gender, bio, userImage 
+        $sql = "SELECT userID, firstName, lastName, userName, email, role, gender, bio, userImage 
                 FROM users 
                 WHERE userID='$userID' 
                 LIMIT 1";

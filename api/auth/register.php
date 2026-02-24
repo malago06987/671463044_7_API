@@ -17,7 +17,7 @@ if(isset($data['email']) && isset($data['password'])){
     // optional fields
     $firstName = isset($data['firstName']) ? $data['firstName'] : NULL;
     $lastName  = isset($data['lastName']) ? $data['lastName'] : NULL;
-    $nickName  = isset($data['nickName']) ? $data['nickName'] : NULL;
+    $userName  = isset($data['userName']) ? $data['userName'] : NULL;
     $gender    = isset($data['gender']) ? $data['gender'] : 'unknown';
     $role      = 'user';
 
@@ -43,11 +43,11 @@ if(isset($data['email']) && isset($data['password'])){
     // ✅ ถ้าจะให้ดีขึ้น (แนะนำ) ให้ใช้ hash:
     // $passwordToSave = password_hash($password, PASSWORD_DEFAULT);
 
-    $sql = "INSERT INTO users (firstName, lastName, nickName, email, password, role, gender, created_at, updated_at)
+    $sql = "INSERT INTO users (firstName, lastName, userName, email, password, role, gender, created_at, updated_at)
             VALUES (
               " . ($firstName ? "'$firstName'" : "NULL") . ",
               " . ($lastName  ? "'$lastName'"  : "NULL") . ",
-              " . ($nickName  ? "'$nickName'"  : "NULL") . ",
+              " . ($userName  ? "'$userName'"  : "NULL") . ",
               '$email',
               '$passwordToSave',
               '$role',

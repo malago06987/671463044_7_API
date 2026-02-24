@@ -24,10 +24,11 @@ if(isset($data['postDetail']) && isset($data['postTopic']) && trim($data['postDe
     $postTopic = $data['postTopic'];
     $userID = $user['userID'];
 
-    $sql = "INSERT INTO post 
-            (postDetail, postTopic, postBy, created_at, updated_at)
-            VALUES 
-            ('$postDetail', '$postTopic', '$userID', NOW(), NOW())";
+    // แก้ postTopic เป็น topicID และแก้ postBy เป็น userID
+$sql = "INSERT INTO post 
+        (postDetail, topicID, userID, created_at, updated_at)
+        VALUES 
+        ('$postDetail', '$postTopic', '$userID', NOW(), NOW())";
 
     if($conn->query($sql) === TRUE){
 
