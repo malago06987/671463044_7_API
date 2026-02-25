@@ -2,59 +2,63 @@
 include '../config/headers.php';
 include '../config/connectDB.php';
 
-$response = array();
+$response = [];
 
-// ===== pagination =====
-$page  = isset($_GET['page'])  ? intval($_GET['page'])  : 1;
-$limit = isset($_GET['limit']) ? intval($_GET['limit']) : 5;
-
-if($page < 1)  $page = 1;
-if($limit < 1) $limit = 5;
-
-$offset = ($page - 1) * $limit;
+// ===== search =====
+$search = isset($_GET['search']) ? trim($_GET['search']) : "";
 
 // ===== base query =====
 $sql = "SELECT 
             p.postID,
             p.postDetail,
+            p.postImage,
             p.created_at,
-            u.nickName,
+            u.userName,
             u.firstName,
             u.lastName,
             u.userImage,
             t.topicName,
-            c.name AS categoryName
+            c.name AS categoryName,
+            IFNULL(lc.likeCount, 0) AS likeCount
         FROM post p
-        LEFT JOIN users u ON p.postBy = u.userID
-        LEFT JOIN topic t ON p.postTopic = t.topicID
+        LEFT JOIN users u ON p.userID = u.userID
+        LEFT JOIN topic t ON p.topicID = t.topicID
         LEFT JOIN categories c ON t.categoriesID = c.categoriesID
+        LEFT JOIN (
+            SELECT postID, COUNT(*) AS likeCount
+            FROM like_post
+            WHERE value = 1
+            GROUP BY postID
+        ) lc ON p.postID = lc.postID
         WHERE 1";
 
-// ===== search =====
-if(isset($_GET['search']) && $_GET['search'] != ""){
-    $search = $_GET['search'];
-    $sql .= " AND (p.postDetail LIKE '%$search%' 
-                   OR t.topicName LIKE '%$search%' 
-                   OR c.name LIKE '%$search%')";
+// ===== search condition =====
+if ($search !== "") {
+    $safe = $conn->real_escape_string($search);
+    $sql .= " AND (
+                p.postDetail LIKE '%$safe%' 
+                OR t.topicName LIKE '%$safe%' 
+                OR c.name LIKE '%$safe%'
+                OR u.userName LIKE '%$safe%'
+             )";
 }
 
-$sql .= " ORDER BY p.postID DESC LIMIT $offset, $limit";
+// ===== filter by category =====
+if (isset($_GET['categoriesID']) && $_GET['categoriesID'] !== "") {
+    $catId = intval($_GET['categoriesID']);
+    $sql .= " AND c.categoriesID = $catId";
+}
+
+$sql .= " ORDER BY p.postID DESC";
 
 $result = $conn->query($sql);
 
-if($result && $result->num_rows > 0){
-
-    while($row = $result->fetch_assoc()){
+if ($result && $result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
         $response[] = $row;
     }
-
 } else {
-
-    $response = array(
-        "status" => "error",
-        "message" => "No posts found"
-    );
-
+    $response = [];
 }
 
 echo json_encode($response);

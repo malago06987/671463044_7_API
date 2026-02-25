@@ -38,7 +38,7 @@ if(isset($data['email']) && isset($data['password'])){
     }
 
     // ถ้าอาจารย์ยังไม่สอน hash ใช้ตรงนี้ก่อน (plain)
-    $passwordToSave = $password;
+$passwordToSave = password_hash($password, PASSWORD_DEFAULT);
 
     // ✅ ถ้าจะให้ดีขึ้น (แนะนำ) ให้ใช้ hash:
     // $passwordToSave = password_hash($password, PASSWORD_DEFAULT);

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Feb 23, 2026 at 09:33 AM
+-- Generation Time: Feb 25, 2026 at 01:05 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -32,6 +32,16 @@ CREATE TABLE `categories` (
   `name` varchar(150) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Dumping data for table `categories`
+--
+
+INSERT INTO `categories` (`categoriesID`, `name`) VALUES
+(4, 'ทั่วไป'),
+(3, 'ภาพยนตร์'),
+(2, 'เกม'),
+(1, 'เทคโนโลยี');
+
 -- --------------------------------------------------------
 
 --
@@ -47,6 +57,25 @@ CREATE TABLE `comment` (
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Dumping data for table `comment`
+--
+
+INSERT INTO `comment` (`commentID`, `postID`, `userID`, `commentDetail`, `created_at`, `updated_at`) VALUES
+(1, 1, 2, 'ขอบคุณมาก อ่านแล้วเข้าใจขึ้นเยอะ', '2026-02-24 21:41:43', '2026-02-24 21:41:43'),
+(2, 1, 3, 'งงตรง props นิดนึง แต่รวมๆดี', '2026-02-24 21:41:43', '2026-02-24 21:41:43'),
+(3, 2, 2, 'เอออันนี้แหละที่กูหาอยู่', '2026-02-24 21:41:43', '2026-02-24 21:41:43'),
+(4, 2, 4, 'ขอไฟล์ตัวอย่างได้ไหม', '2026-02-24 21:41:43', '2026-02-24 21:41:43'),
+(5, 3, 2, 'เกมนี้โหดจริง แต่เพลิน', '2026-02-24 21:41:43', '2026-02-24 21:41:43'),
+(6, 4, 1, 'เห็นด้วย เรื่องนี้ภาพสวยมาก', '2026-02-24 21:41:43', '2026-02-24 21:41:43'),
+(7, 5, 5, 'กูด้วย 5555', '2026-02-24 21:41:43', '2026-02-24 21:41:43'),
+(8, 6, 1, 'useEffect = ทำงานตอน render/ค่าเปลี่ยน', '2026-02-24 21:41:43', '2026-02-24 21:41:43'),
+(9, 7, 3, 'แก้ CORS ที่ headers.php เลย', '2026-02-24 21:41:43', '2026-02-24 21:41:43'),
+(10, 8, 5, 'ลอง The Long Dark ถ้าชอบเอาตัวรอด', '2026-02-24 21:41:43', '2026-02-24 21:41:43'),
+(11, 1, 1, 'props คือข้อมูลที่ส่งจาก component แม่ไปลูก', '2026-02-24 21:41:43', '2026-02-24 21:41:43'),
+(12, 2, 1, 'ไฟล์ตัวอย่างเดี๋ยวค่อยแนบใน repo ได้', '2026-02-24 21:41:43', '2026-02-24 21:41:43'),
+(13, 7, 1, 'ถ้าใช้ vite ต้องให้ backend ตอบ OPTIONS ด้วย', '2026-02-24 21:41:43', '2026-02-24 21:41:43');
+
 -- --------------------------------------------------------
 
 --
@@ -61,6 +90,15 @@ CREATE TABLE `comment_images` (
   `created_at` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Dumping data for table `comment_images`
+--
+
+INSERT INTO `comment_images` (`commentImageID`, `commentID`, `imageUrl`, `sortOrder`, `created_at`) VALUES
+(1, 1, 'img/comment/c1_1.jpg', 1, '2026-02-24 21:41:43'),
+(2, 3, 'img/comment/c3_1.jpg', 1, '2026-02-24 21:41:43'),
+(3, 6, 'img/comment/c6_1.jpg', 1, '2026-02-24 21:41:43');
+
 -- --------------------------------------------------------
 
 --
@@ -74,6 +112,15 @@ CREATE TABLE `comment_reply` (
   `created_at` datetime NOT NULL DEFAULT current_timestamp()
 ) ;
 
+--
+-- Dumping data for table `comment_reply`
+--
+
+INSERT INTO `comment_reply` (`replyID`, `parentCommentID`, `childCommentID`, `created_at`) VALUES
+(1, 2, 11, '2026-02-24 21:41:43'),
+(2, 4, 12, '2026-02-24 21:41:43'),
+(3, 9, 13, '2026-02-24 21:41:43');
+
 -- --------------------------------------------------------
 
 --
@@ -86,6 +133,17 @@ CREATE TABLE `favorites` (
   `postID` bigint(20) UNSIGNED NOT NULL,
   `created_at` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `favorites`
+--
+
+INSERT INTO `favorites` (`favoritesID`, `userID`, `postID`, `created_at`) VALUES
+(1, 2, 1, '2026-02-24 21:41:43'),
+(2, 2, 2, '2026-02-24 21:41:43'),
+(3, 3, 2, '2026-02-24 21:41:43'),
+(4, 4, 4, '2026-02-24 21:41:43'),
+(5, 5, 3, '2026-02-24 21:41:43');
 
 -- --------------------------------------------------------
 
@@ -101,6 +159,20 @@ CREATE TABLE `like_post` (
   `created_at` datetime DEFAULT current_timestamp(),
   `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `like_post`
+--
+
+INSERT INTO `like_post` (`likepostID`, `postID`, `userID`, `value`, `created_at`, `updated_at`) VALUES
+(1, 1, 2, 1, '2026-02-24 21:41:43', '2026-02-24 21:41:43'),
+(2, 1, 3, 1, '2026-02-24 21:41:43', '2026-02-24 21:41:43'),
+(3, 2, 2, 1, '2026-02-24 21:41:43', '2026-02-24 21:41:43'),
+(4, 2, 4, 1, '2026-02-24 21:41:43', '2026-02-24 21:41:43'),
+(5, 3, 5, 1, '2026-02-24 21:41:43', '2026-02-24 21:41:43'),
+(6, 4, 1, 1, '2026-02-24 21:41:43', '2026-02-24 21:41:43'),
+(7, 5, 5, 1, '2026-02-24 21:41:43', '2026-02-24 21:41:43'),
+(8, 7, 3, 1, '2026-02-24 21:41:43', '2026-02-24 21:41:43');
 
 -- --------------------------------------------------------
 
@@ -118,6 +190,20 @@ CREATE TABLE `post` (
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Dumping data for table `post`
+--
+
+INSERT INTO `post` (`postID`, `topicID`, `userID`, `postDetail`, `postImage`, `created_at`, `updated_at`) VALUES
+(1, 1, 1, 'สรุป React เบื้องต้น: component / state / props', 'img/post/p1.jpg', '2026-02-24 21:41:43', '2026-02-24 21:41:43'),
+(2, 2, 1, 'ตัวอย่าง REST API ด้วย PHP แบบง่ายๆ', 'img/post/p2.jpg', '2026-02-24 21:41:43', '2026-02-24 21:41:43'),
+(3, 3, 5, 'เกม survival ที่เล่นแล้วหัวร้อน แต่สนุก', 'img/post/p3.jpg', '2026-02-24 21:41:43', '2026-02-24 21:41:43'),
+(4, 4, 2, 'หนังไซไฟเรื่องนี้พล็อตดี ภาพสวย แต่จบแปลก', 'img/post/p4.jpg', '2026-02-24 21:41:43', '2026-02-24 21:41:43'),
+(5, 5, 3, 'วันนี้มีใครเรียนไม่รู้เรื่องเหมือนกันบ้าง', NULL, '2026-02-24 21:41:43', '2026-02-24 21:41:43'),
+(6, 1, 3, 'useEffect ใช้ทำอะไร สรุปให้หน่อย', NULL, '2026-02-24 21:41:43', '2026-02-24 21:41:43'),
+(7, 2, 2, 'CORS คืออะไร ทำไมยิงจาก React แล้วติด', NULL, '2026-02-24 21:41:43', '2026-02-24 21:41:43'),
+(8, 3, 4, 'เล่นคนเดียวเกมไหนคุ้มๆ แนะนำหน่อย', NULL, '2026-02-24 21:41:43', '2026-02-24 21:41:43');
+
 -- --------------------------------------------------------
 
 --
@@ -131,6 +217,17 @@ CREATE TABLE `post_images` (
   `sortOrder` int(11) DEFAULT NULL,
   `created_at` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `post_images`
+--
+
+INSERT INTO `post_images` (`postImageID`, `postID`, `imageUrl`, `sortOrder`, `created_at`) VALUES
+(1, 1, 'img/post/1_1.jpg', 1, '2026-02-24 21:41:43'),
+(2, 1, 'img/post/1_2.jpg', 2, '2026-02-24 21:41:43'),
+(3, 2, 'img/post/2_1.jpg', 1, '2026-02-24 21:41:43'),
+(4, 3, 'img/post/3_1.jpg', 1, '2026-02-24 21:41:43'),
+(5, 4, 'img/post/4_1.jpg', 1, '2026-02-24 21:41:43');
 
 -- --------------------------------------------------------
 
@@ -146,6 +243,17 @@ CREATE TABLE `topic` (
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `topic`
+--
+
+INSERT INTO `topic` (`topicID`, `topicName`, `categoriesID`, `userID`, `created_at`, `updated_at`) VALUES
+(1, 'React / Frontend', 1, 1, '2026-02-24 21:41:43', '2026-02-24 21:41:43'),
+(2, 'PHP / API', 1, 1, '2026-02-24 21:41:43', '2026-02-24 21:41:43'),
+(3, 'เกมแนว Survival', 2, 5, '2026-02-24 21:41:43', '2026-02-24 21:41:43'),
+(4, 'รีวิวหนังไซไฟ', 3, 2, '2026-02-24 21:41:43', '2026-02-24 21:41:43'),
+(5, 'คุยเล่นทั่วไป', 4, 3, '2026-02-24 21:41:43', '2026-02-24 21:41:43');
 
 -- --------------------------------------------------------
 
@@ -167,6 +275,17 @@ CREATE TABLE `users` (
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `users`
+--
+
+INSERT INTO `users` (`userID`, `firstName`, `lastName`, `userName`, `email`, `password`, `role`, `gender`, `bio`, `userImage`, `created_at`, `updated_at`) VALUES
+(1, 'Somchai', 'Jaidee', 'chai', 'chai@gmail.com', '1234', 'admin', 'male', 'แอดมินของระบบ', 'img/profile/u1.png', '2026-02-24 21:41:43', '2026-02-24 21:41:43'),
+(2, 'Suda', 'Wong', 'suda', 'suda@gmail.com', '1234', 'user', 'female', 'ชอบอ่าน ชอบเม้นท์', 'img/profile/u2.png', '2026-02-24 21:41:43', '2026-02-24 21:41:43'),
+(3, 'Anan', 'Krit', 'anan', 'anan@gmail.com', '1234', 'user', 'male', 'มือใหม่หัดโพสต์', 'img/profile/u3.png', '2026-02-24 21:41:43', '2026-02-24 21:41:43'),
+(4, 'Mali', 'Siri', 'mali', 'mali@gmail.com', '1234', 'user', 'female', 'สายส่องเฉยๆ', 'img/profile/u4.png', '2026-02-24 21:41:43', '2026-02-24 21:41:43'),
+(5, 'Boss', 'Tan', 'boss', 'boss@gmail.com', '1234', 'user', 'male', 'เล่นเกมเยอะ', 'img/profile/u5.png', '2026-02-24 21:41:43', '2026-02-24 21:41:43');
 
 --
 -- Indexes for dumped tables
@@ -262,19 +381,19 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `categories`
 --
 ALTER TABLE `categories`
-  MODIFY `categoriesID` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `categoriesID` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `comment`
 --
 ALTER TABLE `comment`
-  MODIFY `commentID` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `commentID` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT for table `comment_images`
 --
 ALTER TABLE `comment_images`
-  MODIFY `commentImageID` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `commentImageID` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `comment_reply`
@@ -286,37 +405,37 @@ ALTER TABLE `comment_reply`
 -- AUTO_INCREMENT for table `favorites`
 --
 ALTER TABLE `favorites`
-  MODIFY `favoritesID` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `favoritesID` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `like_post`
 --
 ALTER TABLE `like_post`
-  MODIFY `likepostID` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `likepostID` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `post`
 --
 ALTER TABLE `post`
-  MODIFY `postID` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `postID` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `post_images`
 --
 ALTER TABLE `post_images`
-  MODIFY `postImageID` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `postImageID` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `topic`
 --
 ALTER TABLE `topic`
-  MODIFY `topicID` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `topicID` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `userID` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `userID` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- Constraints for dumped tables

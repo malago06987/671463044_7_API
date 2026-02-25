@@ -3,23 +3,21 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-function checkLogin($conn){
-    if(isset($_SESSION['userID']) && !empty($_SESSION['userID'])){
+function checkLogin(mysqli $conn) {
+    if (empty($_SESSION['userID'])) return false;
 
-        $userID = $_SESSION['userID'];
+    $userID = (int)$_SESSION['userID'];
 
-        $sql = "SELECT userID, firstName, lastName, userName, email, role, gender, bio, userImage 
-                FROM users 
-                WHERE userID='$userID' 
-                LIMIT 1";
+    $stmt = $conn->prepare("
+        SELECT userID, firstName, lastName, nickName, email, role, gender, bio, userImage
+        FROM users
+        WHERE userID = ?
+        LIMIT 1
+    ");
+    $stmt->bind_param("i", $userID);
+    $stmt->execute();
 
-        $result = $conn->query($sql);
-
-        if($result && $result->num_rows > 0){
-            return $result->fetch_assoc();
-        }
-    }
-
-    return false;
+    $res = $stmt->get_result();
+    return ($res && $res->num_rows > 0) ? $res->fetch_assoc() : false;
 }
 ?>

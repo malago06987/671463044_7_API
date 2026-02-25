@@ -21,26 +21,24 @@ if(isset($data['email']) && isset($data['password'])){
 
     if($result && $result->num_rows > 0){
 
-        $row = $result->fetch_assoc();
+      $row = $result->fetch_assoc();
 
-        // ถ้ายังไม่ hash password ใช้แบบนี้ก่อน
-        if($password == $row['password']){
+if (password_verify($password, $row['password'])) {
 
-            $_SESSION['userID'] = $row['userID'];
+    $_SESSION['userID'] = $row['userID'];
 
-            $response = array(
-                "status" => "success",
-                "message" => "Login successful"
-            );
+    $response = array(
+        "status" => "success",
+        "message" => "Login successful"
+    );
 
-        } else {
+} else {
 
-            $response = array(
-                "status" => "error",
-                "message" => "Password incorrect"
-            );
-
-        }
+    $response = array(
+        "status" => "error",
+        "message" => "Password incorrect"
+    );
+}
 
     } else {
 
