@@ -2,62 +2,67 @@
 include '../config/headers.php';
 include '../config/connectDB.php';
 
-$response = array();
-
-if(isset($_GET['id']) && $_GET['id'] != ""){
-
-    $postID = $_GET['id'];
-
-    // ปรับชื่อ field/table ตาม DB มึงได้
-    $sql = "SELECT 
-                p.postID,
-                p.postDetail,
-                p.postTopic,
-                p.postBy,
-                p.created_at,
-                p.updated_at,
-                u.nickName,
-                u.firstName,
-                u.lastName,
-                u.userImage,
-                t.topicName,
-                t.categoriesID,
-                c.name AS categoryName
-            FROM post p
-            LEFT JOIN users u ON p.postBy = u.userID
-            LEFT JOIN topic t ON p.postTopic = t.topicID
-            LEFT JOIN categories c ON t.categoriesID = c.categoriesID
-            WHERE p.postID = '$postID'
-            LIMIT 1";
-
-    $result = $conn->query($sql);
-
-    if($result && $result->num_rows > 0){
-
-        $row = $result->fetch_assoc();
-
-        $response = array(
-            "status" => "success",
-            "post" => $row
-        );
-
-    } else {
-
-        $response = array(
-            "status" => "error",
-            "message" => "Post not found"
-        );
-
-    }
-
-} else {
-
-    $response = array(
+if (!isset($_GET['id']) || trim($_GET['id']) === "") {
+    echo json_encode([
         "status" => "error",
         "message" => "id is required"
-    );
-
+    ]);
+    exit;
 }
 
-echo json_encode($response);
+$postID = $_GET['id'];
+
+$sql = "SELECT 
+            p.postID,
+            p.topicID,
+            p.userID,
+            p.postDetail AS content,
+            p.postImage AS img,
+            p.created_at,
+            p.updated_at,
+
+            t.topicName AS title,
+            t.categoriesID,
+            c.name AS category_name,
+
+            u.userImage,
+            COALESCE(NULLIF(u.userName,''), CONCAT_WS(' ', u.firstName, u.lastName)) AS userName,
+
+            -- ✅ นับจาก like_post (ของจริงที่มึงใช้)
+            COALESCE((
+              SELECT SUM(CASE WHEN lp.value=1 THEN 1 ELSE 0 END)
+              FROM like_post lp
+              WHERE lp.postID = p.postID
+            ),0) AS likes,
+
+            COALESCE((
+              SELECT SUM(CASE WHEN lp.value=-1 THEN 1 ELSE 0 END)
+              FROM like_post lp
+              WHERE lp.postID = p.postID
+            ),0) AS dislikes
+
+        FROM post p
+        LEFT JOIN topic t ON p.topicID = t.topicID
+        LEFT JOIN categories c ON t.categoriesID = c.categoriesID
+        LEFT JOIN users u ON p.userID = u.userID
+        WHERE p.postID = ?
+        LIMIT 1";
+
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("i", $postID);
+$stmt->execute();
+$result = $stmt->get_result();
+
+if ($result && $result->num_rows > 0) {
+    $row = $result->fetch_assoc();
+    echo json_encode([
+        "status" => "success",
+        "data" => $row
+    ]);
+} else {
+    echo json_encode([
+        "status" => "error",
+        "message" => "Post not found"
+    ]);
+}
 ?>

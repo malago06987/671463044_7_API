@@ -1,14 +1,26 @@
 <?php
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+// ห้ามมีช่องว่างก่อน <?php เด็ดขาด
 
-$origin = "http://localhost:5175"; // React/Vite ของมึง (แก้ให้ตรง)
+$origin = $_SERVER['HTTP_ORIGIN'] ?? '';
 
-header("Access-Control-Allow-Origin: $origin");   // ❗ ต้องระบุ origin ห้าม *
-header("Access-Control-Allow-Credentials: true"); // ✅ เปิดให้ส่ง cookie/session
-header("Access-Control-Allow-Headers: *");        // คงสไตล์เดิม
-header("Access-Control-Allow-Methods: *");        // คงสไตล์เดิม
+$allow = [
+  'http://localhost:5173',
+  'http://localhost:5175',
+];
+
+if (in_array($origin, $allow, true)) {
+  header("Access-Control-Allow-Origin: $origin");
+} else {
+  // ถ้ายังอยากให้ผ่านทุก origin (dev เท่านั้น)
+  // header("Access-Control-Allow-Origin: *");
+}
+
+header("Access-Control-Allow-Credentials: true");
+header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
+header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
 header("Content-Type: application/json; charset=UTF-8");
 
-if ($_SERVER["REQUEST_METHOD"] === "OPTIONS") exit;
-?>
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+  http_response_code(200);
+  exit;
+}

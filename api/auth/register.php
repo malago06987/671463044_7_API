@@ -1,24 +1,25 @@
 <?php
 include '../config/headers.php';
 include '../config/connectDB.php';
+session_start();
 
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
-$data = json_decode(file_get_contents("php://input"), true);
 $response = array();
 
-if(isset($data['email']) && isset($data['password'])){
+/*
+  ✅ สำคัญ: อัปโหลดรูปต้องใช้ multipart/form-data
+  ดังนั้นข้อมูลจะมาใน $_POST และไฟล์มาใน $_FILES
+*/
 
-    $email = $data['email'];
-    $password = $data['password'];
+$email    = $_POST['email'] ?? '';
+$password = $_POST['password'] ?? '';
+
+if($email !== '' && $password !== ''){
 
     // optional fields
-    $firstName = isset($data['firstName']) ? $data['firstName'] : NULL;
-    $lastName  = isset($data['lastName']) ? $data['lastName'] : NULL;
-    $userName  = isset($data['userName']) ? $data['userName'] : NULL;
-    $gender    = isset($data['gender']) ? $data['gender'] : 'unknown';
+    $firstName = $_POST['firstName'] ?? NULL;
+    $lastName  = $_POST['lastName']  ?? NULL;
+    $userName  = $_POST['userName']  ?? NULL;
+    $gender    = $_POST['gender']    ?? 'unknown';
     $role      = 'user';
 
     // basic validation
@@ -32,18 +33,62 @@ if(isset($data['email']) && isset($data['password'])){
     $checkRes = $conn->query($checkSql);
 
     if($checkRes && $checkRes->num_rows > 0){
-        $response = array("status"=>"error","message"=>"Email already exists");
-        echo json_encode($response);
+        echo json_encode(["status"=>"error","message"=>"Email already exists"]);
         exit();
     }
 
-    // ถ้าอาจารย์ยังไม่สอน hash ใช้ตรงนี้ก่อน (plain)
-$passwordToSave = password_hash($password, PASSWORD_DEFAULT);
+    // hash password
+    $passwordToSave = password_hash($password, PASSWORD_DEFAULT);
 
-    // ✅ ถ้าจะให้ดีขึ้น (แนะนำ) ให้ใช้ hash:
-    // $passwordToSave = password_hash($password, PASSWORD_DEFAULT);
+    // ✅ อัปโหลดรูป (optional)
+    $userImagePath = NULL;
 
-    $sql = "INSERT INTO users (firstName, lastName, userName, email, password, role, gender, created_at, updated_at)
+    if(isset($_FILES['userImage']) && $_FILES['userImage']['error'] === UPLOAD_ERR_OK){
+
+        $tmp  = $_FILES['userImage']['tmp_name'];
+        $size = (int)$_FILES['userImage']['size'];
+
+        // จำกัดขนาด 2MB
+        if($size > 2 * 1024 * 1024){
+            echo json_encode(["status"=>"error","message"=>"Image too large (max 2MB)"]);
+            exit();
+        }
+
+        // เช็คชนิดไฟล์
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $mime = finfo_file($finfo, $tmp);
+        finfo_close($finfo);
+
+        $allow = [
+            "image/jpeg" => "jpg",
+            "image/png"  => "png",
+            "image/webp" => "webp",
+        ];
+
+        if(!isset($allow[$mime])){
+            echo json_encode(["status"=>"error","message"=>"Invalid image type"]);
+            exit();
+        }
+
+        $ext = $allow[$mime];
+
+        $dir = __DIR__ . '/../img/profile';
+        if(!is_dir($dir)) mkdir($dir, 0777, true);
+
+        $filename = 'u_' . time() . '_' . bin2hex(random_bytes(6)) . '.' . $ext;
+        $dest = $dir . '/' . $filename;
+
+        if(!move_uploaded_file($tmp, $dest)){
+            echo json_encode(["status"=>"error","message"=>"Upload failed"]);
+            exit();
+        }
+
+        // เก็บเป็น path ไว้ใน DB
+        $userImagePath = "img/profile/" . $filename;
+    }
+
+    // INSERT (เพิ่ม userImage เข้าไป)
+    $sql = "INSERT INTO users (firstName, lastName, userName, email, password, role, gender, userImage, created_at, updated_at)
             VALUES (
               " . ($firstName ? "'$firstName'" : "NULL") . ",
               " . ($lastName  ? "'$lastName'"  : "NULL") . ",
@@ -52,14 +97,13 @@ $passwordToSave = password_hash($password, PASSWORD_DEFAULT);
               '$passwordToSave',
               '$role',
               '$gender',
+              " . ($userImagePath ? "'$userImagePath'" : "NULL") . ",
               NOW(),
               NOW()
             )";
 
     if($conn->query($sql) === TRUE){
         $newID = $conn->insert_id;
-
-        // จะ auto-login หลังสมัครก็ได้ (สะดวก)
         $_SESSION['userID'] = $newID;
 
         $response = array("status"=>"success","message"=>"Register successful");

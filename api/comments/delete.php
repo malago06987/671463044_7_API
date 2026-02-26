@@ -15,32 +15,36 @@ if(!$user){
 }
 
 $data = json_decode(file_get_contents("php://input"), true);
-
 $response = array();
 
 if(isset($data['commentID']) && !empty($data['commentID'])){
 
-    $commentID = $data['commentID'];
-    $userID = $user['userID'];
-    $role = $user['role'];
+    $commentID = (int)$data['commentID'];
+    $userID = (int)$user['userID'];
+    $role = $user['role'] ?? '';
 
-    // เช็คก่อนว่า comment นี้เป็นของใคร
-    $checkSql = "SELECT userID FROM comment WHERE commentID='$commentID' LIMIT 1";
-    $checkRes = $conn->query($checkSql);
+    // 1) เช็คก่อนว่า comment นี้เป็นของใคร
+    $checkSql = "SELECT userID FROM comment WHERE commentID = ? LIMIT 1";
+    $stmt = $conn->prepare($checkSql);
+    $stmt->bind_param("i", $commentID);
+    $stmt->execute();
+    $checkRes = $stmt->get_result();
 
     if($checkRes && $checkRes->num_rows > 0){
 
         $row = $checkRes->fetch_assoc();
-        $ownerID = $row['userID'];
+        $ownerID = (int)$row['userID'];
 
-        // ลบได้ถ้าเป็นเจ้าของ หรือ admin
-        if($ownerID == $userID || $role == 'admin'){
+        // 2) ลบได้ถ้าเป็นเจ้าของ หรือ admin
+        if($ownerID === $userID || $role === 'admin'){
 
-            $sql = "DELETE FROM comment WHERE commentID='$commentID'";
+            $sql = "DELETE FROM comment WHERE commentID = ?";
+            $stmt2 = $conn->prepare($sql);
+            $stmt2->bind_param("i", $commentID);
 
-            if($conn->query($sql) === TRUE){
+            if($stmt2->execute()){
 
-                if($conn->affected_rows > 0){
+                if($stmt2->affected_rows > 0){
                     $response = array(
                         "status" => "success",
                         "message" => "Comment deleted successfully"

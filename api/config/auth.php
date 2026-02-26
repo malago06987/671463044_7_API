@@ -9,7 +9,7 @@ function checkLogin(mysqli $conn) {
     $userID = (int)$_SESSION['userID'];
 
     $stmt = $conn->prepare("
-        SELECT userID, firstName, lastName, nickName, email, role, gender, bio, userImage
+        SELECT userID, firstName, lastName, userName, email, role, gender, bio, userImage
         FROM users
         WHERE userID = ?
         LIMIT 1
